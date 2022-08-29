@@ -58,33 +58,79 @@ python Main.py [0]
  7. All data save in './results/all.csv'.
     
 
-## Step 2 - Preprocessing and SZZ algorithm
+## Step 2 - Create Tabluar Data
 
-1. Open Data folder named  "Data".
-2. In Data folder open for each project directory with the name NAME_PROJECT and put the file "all.csv" in the directory. For example  (Data -> mahout -> all.csv). 
-3. Additionally, you can put the extracted  data from this repository in directory Data. 
-4. In "variable.py" add the NAME_PROJECT and the key_issue (according to JIRA) to function get_key_issue().
-5. Updare NAME_PROJECT in line 83 and Run :
+This program runs the SZZ algorithm and performs pre-processing on tabular data.
+![Alt Text](https://www.google.com/imgres?imgurl=https%3A%2F%2Fmatthewrenze.com%2Fwp-content%2Fuploads%2F2019%2F10%2Fworking-with-tabular-data.png&imgrefurl=https%3A%2F%2Fmatthewrenze.com%2Farticles%2Fworking-with-tabular-data%2F&tbnid=ca4J_E1Dhc6x3M&vet=12ahUKEwif1cvjrOv5AhXNkv0HHdwHBesQMygHegUIARDRAQ..i&docid=KvyycWd-Ic_fPM&w=1235&h=1086&q=Tabular%20Data&hl=en-GB&ved=2ahUKEwif1cvjrOv5AhXNkv0HHdwHBesQMygHegUIARDRAQ)
+
+1. Open data folder named  "Data".
+2. In Data folder open for each project directory with the name NAME_PROJECT and put the file "all.csv" in the directory. For example  ("Data/knox/all.csv"). 
+3. In "variable.py" add the NAME_PROJECT and the key_issue (according to JIRA) to function get_key_issue(). 
+4. Update projects varibale in file CreateData.py and run:
    ```
    python main_create_data.py
    ```
-7. After the run train and test file created in the path (Data -> NAME_PROJECT -> train_test). 
+5. After this run several file created:
+   - "Data/{NAME_PROJECT}/all_after_preprocess.csv" - this file is the tabular data for RF and LR after pre-processing.
+   - "Data/{NAME_PROJECT}/blame/pydriller_{NAME_PROJECT}_bugfixes_bic.csv" - the results of the SZZ algorithm.
 
-## Step 3 -  [Train CTGAN](https://github.com/sdv-dev/CTGAN)
 
-1. Train CTGAN algorithm in folder CTGAN -> "run.py".
+## Step 3 - Create Raw Textual Data 
+
+In parallel to step 2, you can generate raw textual data.
+![Alt Text](https://www.google.com/imgres?imgurl=https%3A%2F%2Fmiro.medium.com%2Fmax%2F940%2F1*hkvlwY5szjW3kJcyTnzSVQ.png&imgrefurl=https%3A%2F%2Fmedium.com%2Fdesign-and-development%2Fnatural-language-processing-nlp-in-everyday-life-834c37f46e59&tbnid=SiPhYyRMBt2I0M&vet=12ahUKEwj1qf-Brev5AhVsnv0HHSUiCIEQMyghegUIARDgAQ..i&docid=z_HOU-4j8csfSM&w=940&h=788&itg=1&q=Raw%20Textual%20Data%20nlp&hl=en-GB&ved=2ahUKEwj1qf-Brev5AhVsnv0HHSUiCIEQMyghegUIARDgAQ)
+
+1. In main.py update the name_projects and url_projects varible. For example:
    ```
-   python run.py
+   name_projects = ['zeppelin'] # NAME_PROJECT
+   url_projects = ['https://github.com/apache/zeppelin'] # link to github
    ```
-3. You can change the parameters() function with another parameters.
-4. After this process update in (Data -> NAME_PROJECT -> CTGAN -> FILE_CREATE) the FILE_CREATE from this runing.
+2. Execute: 
+  ```
+   python main.py 0
+   ```
+    * Note: 0 - indicate to genrate the raw textual data for the real data.
+3. After this run several file created:
+   - for each cross 'k' from 1 to 5:
+      - "Data/{NAME_PROJECT}/{k}/{NAME_PROJECT}_train.pkl" - train data set. 
+      - "Data/{NAME_PROJECT}/{k}/{NAME_PROJECT}_test.pkl" - test data set.
+      - "Data/{NAME_PROJECT}/{k}/{NAME_PROJECT}_dict.pkl" - dictionary for tha data.
+      - "Files/{NAME_PROJECT}/{k}/{NAME_PROJECT}_methods.csv" - the methods that the modification changed are recorded for each file in the test set.
+      - "Files/{NAME_PROJECT}/{k}/{commit.hash}_after_{file.filename}" - the test file after the modification was written for the transformations phase. 
+      - "Files/{NAME_PROJECT}/{k}/{commit.hash}_before_{file.filename}" - the test file before the modification was written for the transformations phase. 
 
 
-## Step 4 - Run Algoritham 
-1. In folder Algorithm ave 3 file - "RF.py", "LR.py" and "Sec_GAN.py".
-2. You can run each algorithm with '__main__' - you can change  the name project. 
-3. Additionally,  you can change the parameters of "Sec_GAN.py" in the parameters dict. 
+## Step 4 - Transformation 
 
 
- 
+## Step 5 - Create Transformation Data
+
+
+
+## Step 6 - Run Machine Learning Models (RF and LR)
+
+1. In tabular_data.py projects varible. For example:
+   ```
+   projects = ['knox'] # NAME_PROJECT
+   ```
+2. Execute: 
+  ```
+   python tabular_data.py
+  ```
+3. This process consisted of several steps:
+   - read the tabluar data from step 2 and split to train test accroding the raw textual data. for each cross 'k' from 1 to 5:
+      - "Data/{NAME_PROJECT}/{k}/{NAME_PROJECT}_test_tabular.csv" - train data set. 
+      - "Data/{NAME_PROJECT}/{k}/{NAME_PROJECT}_test_tabular.csv" - test data set.
+   - Tuning for RF and RF completed
+   - The results written to:
+      - "Data/{NAME_PROJECT}/{model}/metrics_avg.csv" - results for baseline performance
+      - "Data/{NAME_PROJECT}/{model}/evel_avg.csv" - results for RQ1 and RQ2.
+
+## Step 6 - Run [DeepJIT](https://github.com/hvdthong/DeepJIT_updated) and Run [CC2Vec](https://github.com/CC2Vec/CC2Vec)
+   
+Run the models with the data created in step 3 according to the readme file in GitHub.
+
+
+* Take at note that maybe you will be need change the relative path in the project.
+
 ## Good luck !!! 
