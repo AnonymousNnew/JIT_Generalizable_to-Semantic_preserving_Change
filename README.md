@@ -77,7 +77,6 @@ This program runs the SZZ algorithm and performs pre-processing on tabular data.
 ## Step 3 - Create Raw Textual Data 
 
 In parallel to step 2, you can generate raw textual data.
-![Alt Text](https://miro.medium.com/max/1400/1*hkvlwY5szjW3kJcyTnzSVQ.png)
 
 1. In main.py update the name_projects and url_projects varible. For example:
    ```
