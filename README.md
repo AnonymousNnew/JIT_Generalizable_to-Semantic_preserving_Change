@@ -2,11 +2,13 @@
 
 ## I'm grateful that you're interested in my work! :)
 
+![Alt Text](https://c.tenor.com/vqeev_89AP0AAAAC/excited-adorable.gif)
+
 I hope the following guide will make it easier for you to understand what we did.
 
 ## Requirements
 
-Install all requirements in the "requirements.txt" file
+Install all requirements in the [requirements.txt](https://github.com/AnonymousNnew/JIT_Generalizable_to_Semantic_Preservation_Change/blob/main/requirements.txt) file
 
 ## Step 1 - Extract Data:
 
@@ -31,7 +33,11 @@ Install all requirements in the "requirements.txt" file
       python ./javadiff/setup.py install
      ```
     * java version 11 and 8
-3. Checkout to directory name "./local_repo" the repository. For example: apache/deltaspike.
+3. Checkout to directory name "./local_repo" the repository. For example:
+   ```
+   cd local_repo
+   git clone https://github.com/apache/deltaspike.git
+   ```
 4. Execute: 
 ```
 python Main.py [0]
