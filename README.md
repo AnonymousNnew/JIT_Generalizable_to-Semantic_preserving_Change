@@ -14,7 +14,8 @@ Install all requirements in the [requirements.txt](https://github.com/AnonymousN
 
 1. Download the folder named bic and javadiff.
 2. Requirements: 
-    * Python 3.9 - then run: 
+    * Python 3.9 - then run:  
+    
     ```
       python -m pip install --upgrade pip
       pip install pytest 
@@ -34,17 +35,20 @@ Install all requirements in the [requirements.txt](https://github.com/AnonymousN
      ```
     * java version 11 and 8
 3. Checkout to directory name "./local_repo" the repository. For example:
+
    ```
    cd local_repo
    git clone https://github.com/apache/deltaspike.git
    ```
 4. Execute: 
+
 ```
 python Main.py [0]
 ```
   * Note: [0] - indicate  the number of commit extract in windown size of 50.  For large project set [0, 1, 2.....200].
  5. After the run the file save in "./results/" folder. 
  6. To merge all file Run:
+ 
   ```
     import pandas as pd
     import glob
@@ -66,6 +70,7 @@ This program runs the SZZ algorithm and performs pre-processing on tabular data.
 2. In Data folder open for each project directory with the name NAME_PROJECT and put the file "all.csv" in the directory. For example  ("Data/knox/all.csv"). 
 3. In "variable.py" add the NAME_PROJECT and the key_issue (according to JIRA) to function get_key_issue(). 
 4. Update projects varibale in file CreateData.py and run:
+
    ```
    python main_create_data.py
    ```
@@ -79,11 +84,13 @@ This program runs the SZZ algorithm and performs pre-processing on tabular data.
 In parallel to step 2, you can generate raw textual data.
 
 1. In main.py update the name_projects and url_projects varible. For example:
+
    ```
    name_projects = ['zeppelin'] # NAME_PROJECT
    url_projects = ['https://github.com/apache/zeppelin'] # link to github
    ```
 2. Execute: 
+
   ```
    python main.py 0
    ```
@@ -105,6 +112,7 @@ This step activates the transformations on the written test files.
 
 1.  Place the JavaTransformerWorkflows.ja in a directory separate from this project's directory (putside form this project's directory).
 2. Execute: 
+
    ```
    java -jar JavaTransformerWorkflows.jar {k} {NAME_PROJECT} {index}
    ```
@@ -116,11 +124,13 @@ This step activates the transformations on the written test files.
 ## Step 5 - Create Transformation Data
 
 1. In main.py update the name_projects and url_projects varible. For example:
+
    ```
    name_projects = ['zeppelin'] # NAME_PROJECT
    url_projects = ['https://github.com/apache/zeppelin'] # link to github
    ```
 2. Execute: 
+
   ```
    python main.py 1
    ```
@@ -137,10 +147,12 @@ This step activates the transformations on the written test files.
 ## Step 6 - Run Machine Learning Models (RF and LR)
 
 1. In tabular_data.py projects varible. For example:
+
    ```
    projects = ['knox'] # NAME_PROJECT
    ```
 2. Execute: 
+
   ```
    python tabular_data.py
   ```
