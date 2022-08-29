@@ -61,7 +61,6 @@ python Main.py [0]
 ## Step 2 - Create Tabluar Data
 
 This program runs the SZZ algorithm and performs pre-processing on tabular data.
-![Alt Text](https://www.google.com/imgres?imgurl=https%3A%2F%2Fmatthewrenze.com%2Fwp-content%2Fuploads%2F2019%2F10%2Fworking-with-tabular-data.png&imgrefurl=https%3A%2F%2Fmatthewrenze.com%2Farticles%2Fworking-with-tabular-data%2F&tbnid=ca4J_E1Dhc6x3M&vet=12ahUKEwif1cvjrOv5AhXNkv0HHdwHBesQMygHegUIARDRAQ..i&docid=KvyycWd-Ic_fPM&w=1235&h=1086&q=Tabular%20Data&hl=en-GB&ved=2ahUKEwif1cvjrOv5AhXNkv0HHdwHBesQMygHegUIARDRAQ)
 
 1. Open data folder named  "Data".
 2. In Data folder open for each project directory with the name NAME_PROJECT and put the file "all.csv" in the directory. For example  ("Data/knox/all.csv"). 
@@ -78,7 +77,7 @@ This program runs the SZZ algorithm and performs pre-processing on tabular data.
 ## Step 3 - Create Raw Textual Data 
 
 In parallel to step 2, you can generate raw textual data.
-![Alt Text](https://www.google.com/imgres?imgurl=https%3A%2F%2Fmiro.medium.com%2Fmax%2F940%2F1*hkvlwY5szjW3kJcyTnzSVQ.png&imgrefurl=https%3A%2F%2Fmedium.com%2Fdesign-and-development%2Fnatural-language-processing-nlp-in-everyday-life-834c37f46e59&tbnid=SiPhYyRMBt2I0M&vet=12ahUKEwj1qf-Brev5AhVsnv0HHSUiCIEQMyghegUIARDgAQ..i&docid=z_HOU-4j8csfSM&w=940&h=788&itg=1&q=Raw%20Textual%20Data%20nlp&hl=en-GB&ved=2ahUKEwj1qf-Brev5AhVsnv0HHSUiCIEQMyghegUIARDgAQ)
+![Alt Text](https://miro.medium.com/max/1400/1*hkvlwY5szjW3kJcyTnzSVQ.png)
 
 1. In main.py update the name_projects and url_projects varible. For example:
    ```
@@ -89,7 +88,7 @@ In parallel to step 2, you can generate raw textual data.
   ```
    python main.py 0
    ```
-    * Note: 0 - indicate to genrate the raw textual data for the real data.
+   * Note: 0 - indicate to genrate the raw textual data for the real data.
 3. After this run several file created:
    - for each cross 'k' from 1 to 5:
       - "Data/{NAME_PROJECT}/{k}/{NAME_PROJECT}_train.pkl" - train data set. 
