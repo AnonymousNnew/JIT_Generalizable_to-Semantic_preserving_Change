@@ -110,7 +110,7 @@ In parallel to step 2, you can generate raw textual data.
  
 This step activates the transformations on the written test files.
 
-1.  Place the JavaTransformerWorkflows.ja in a directory separate from this project's directory (putside form this project's directory).
+1.  Place the JavaTransformerWorkflows.jar in a directory with name 'JavaTransformer' separate from this project's directory (putside form this project's directory).
 2. Execute: 
 
    ```
