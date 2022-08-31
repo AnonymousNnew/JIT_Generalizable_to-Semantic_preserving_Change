@@ -165,7 +165,7 @@ This step activates the transformations on the written test files.
       - "Data/{NAME_PROJECT}/{model}/metrics_avg.csv" - results for baseline performance
       - "Data/{NAME_PROJECT}/{model}/evel_avg.csv" - results for RQ1 and RQ2.
 
-## Step 6 - Run [DeepJIT](https://github.com/hvdthong/DeepJIT_updated) and Run [CC2Vec](https://github.com/CC2Vec/CC2Vec)
+## Step 7 - Run [DeepJIT](https://github.com/hvdthong/DeepJIT_updated) and Run [CC2Vec](https://github.com/CC2Vec/CC2Vec)
    
 Run the models with the data created in step 3 according to the readme file in GitHub.
 
