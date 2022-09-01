@@ -60,7 +60,6 @@ def add_modification(dataset):
     .. note:: You must run the function  main_szz() in file issues_extractor.py before execute this function
     """
     modification = pd.read_csv(variable.get_name_dit_blame() + '/modification_commit.csv', delimiter=',')
-    # modification['file_name'] = modification['file_name'].str.lower()
     dataset = dataset.merge(modification, how='inner', left_on=['file_name', 'commit'],
                             right_on=['file_name', 'commit_sha'])
     dataset.drop(['commit_sha'], axis=1, inplace=True)
@@ -79,36 +78,25 @@ def create_directories():
         git.Git(os.path.join("..", "Repo")).clone("https://github.com/apache/" + variable.get_name_github() + ".git")
     if not os.path.exists(os.path.join(NAME_PROJECT)):
         os.mkdir(os.path.join(NAME_PROJECT))
-    if not os.path.exists(os.path.join(NAME_PROJECT, "train_test")):
-        os.mkdir(os.path.join(NAME_PROJECT, "train_test"))
     if not os.path.exists(os.path.join(NAME_PROJECT, "blame")):
         os.mkdir(os.path.join(NAME_PROJECT, "blame"))
-    if not os.path.exists(os.path.join(NAME_PROJECT, "Results")):
-        os.mkdir(os.path.join(NAME_PROJECT, "Results"))
-    if not os.path.exists(os.path.join(NAME_PROJECT, "BEGAN")):
-        os.mkdir(os.path.join(NAME_PROJECT, "BEGAN"))
-    if not os.path.exists(os.path.join(NAME_PROJECT, "load_model")):
-        os.mkdir(os.path.join(NAME_PROJECT, "load_model"))
-    if not os.path.exists(os.path.join("Tuning_Results")):
-        os.mkdir(os.path.join("Tuning_Results"))
 
 
 if __name__ == '__main__':
     # TODO: If you want to add a new project you need add the key_issue to the file named variable.py
 
-    # projects = ['kafka', 'tika', 'zeppelin', 'commons-collections', 'jspwiki', 'zeppelin', 'manifoldcf']
-    projects = ['commons-lang', 'tapestry-5', 'knox', 'xmlgraphics-batik', 'deltaspike']
+    projects = ['kafka', 'tika', 'zeppelin', 'commons-collections', 'jspwiki', 'zeppelin', 'manifoldcf', 'commons-lang', 'tapestry-5', 'knox', 'xmlgraphics-batik', 'deltaspike']
     for p in projects:
         project = p
         with open(os.path.join("name_project.txt"), "w") as f:
             f.write(project)
 
-        NAME_PROJECT = "../WriteFileCommit/Data/" + project
+        NAME_PROJECT = "/Data/" + project
         create_directories()
         print(project)
-        # main_szz(os.path.join("..", "Repo", variable.get_name_github()), variable.get_name_github(),
-        #          variable.get_key_issue(),
-        #          variable.get_repo_full_name(), variable.get_name_dit_blame())
+        main_szz(os.path.join("..", "Repo", variable.get_name_github()), variable.get_name_github(),
+                 variable.get_key_issue(),
+                 variable.get_repo_full_name(), variable.get_name_dit_blame())
         df = pd.read_csv(NAME_PROJECT + "/all.csv")
         commit_blame = read_commit_blame()
         dataset = update_bug(df, commit_blame)

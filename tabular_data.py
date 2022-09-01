@@ -18,7 +18,8 @@ from sklearn.preprocessing import StandardScaler
 from imblearn.over_sampling import SMOTE
 from sklearn import metrics
 
-#
+NAME_DIR = 'Just_In_Time_Defect_Prediction_Models-_Are_They_Generalizable_to_Semantic_Preservation_Change-'
+
 
 tuning_lr_dict = {'deltaspike_1': ['l1', 'liblinear', 0.001], 'deltaspike_2': ['l1', 'liblinear', 0.01],
                   'deltaspike_3': ['l1', 'liblinear', 0.001], 'deltaspike_4': ['l1', 'liblinear', 0.3],
@@ -503,7 +504,7 @@ def predict(model, save_dir, transformer):
         metrics.to_csv(f"{save_dir}/metrics.csv")
 
 
-def merge_metrics_and_evel(name, save_dir, importances):
+def merge_metrics_and_evel(name, save_dir):
     all_data, all_data_evel, all_data_evel_bug, all_data_evel_nb = None, None, None, None
     for k in range(1, NUMBER_FOLD + 1):
         data = pd.read_csv(save_dir + f"{k}//{name}//metrics.csv")
@@ -529,111 +530,65 @@ def merge_metrics_and_evel(name, save_dir, importances):
     del all_data_evel_nb['Real label']
     all_data_evel = pd.concat([all_data_evel.mean(), all_data_evel_nb.mean(), all_data_evel_bug.mean()])
     all_data = all_data.groupby(all_data.index).mean()
-    if not os.path.exists("../WriteFileCommit/Data/" + project + "//" + name):
-        os.makedirs("../WriteFileCommit/Data/" + project + "//" + name)
+    if not os.path.exists(F"../{NAME_DIR}/Data/" + project + "//" + name):
+        os.makedirs(F"../{NAME_DIR}/Data/" + project + "//" + name)
     all_data.to_csv(
-        "../WriteFileCommit/Data/" + project + "//" + name + "//metrics_avg.csv")
+        F"../{NAME_DIR}/Data/" + project + "//" + name + "//metrics_avg.csv")
     all_data_evel.to_csv(
-        "../WriteFileCommit/Data/" + project + "//" + name + "//evel_avg.csv")
-    with open(os.path.join(save_dir + f"{name}//{predict_data}_importances.csv"),
-              'w') as file:
-        writer = csv.writer(file)
-        for key, value in importances.items():
-            writer.writerow([key, value])
-
-
-def merge_importance(importances_list):
-    def average(l):
-        return sum([abs(i) for i in l]) / len(l)
-
-    collected = {}
-    for d in importances_list:
-        for key in d:
-            if key in collected:
-                collected[key].append(d[key])
-            else:
-                collected[key] = [d[key]]
-    for key in collected:
-        collected[key] = average(collected[key])
-    return collected
-
-
-def merge_all_importance(name_model):
-    collected_dict = {}
-    for predict_data in ['test']:
-        importances_list = []
-        for project in ['commons-collections', 'kafka', 'tika', 'zeppelin',  'jspwiki', 'manifoldcf', 'zookeeper',
-                'openwebbeans', ]: # 'deltaspike', 'tapestry-5', 'knox', 'commons-lang', 'xmlgraphics-batik'
-            PATH_FOLDER_DATA = "Data/" + project + "//"
-            data = pd.read_csv(PATH_FOLDER_DATA + f"{name_model}//{predict_data}_importances.csv", header=None)
-            importances_list.append(data.set_index(0).T.to_dict('index')[1])
-        collected = merge_importance(importances_list)
-        collected_dict[predict_data] = collected
-    pd.DataFrame(collected_dict).to_csv("Data/" + f"{name_model}//all_importances.csv")
+        F"../{NAME_DIR}/Data/" + project + "//" + name + "//evel_avg.csv")
 
 
 if __name__ == '__main__':
     NUMBER_FOLD = 5
 
-    projects = [sys.argv[1]] #['commons-collections', 'kafka', 'tika', 'zeppelin',  'jspwiki', 'manifoldcf', 'zookeeper',
-                #'openwebbeans', 'deltaspike', 'tapestry-5', 'knox', 'commons-lang', 'xmlgraphics-batik'] #[sys.argv[1]]  #  ##  [ sys.argv[1]]
-    ## ['commons-lang', 'tapestry-5', 'knox', 'xmlgraphics-batik', 'deltaspike']
+    projects = ['commons-collections', 'kafka', 'tika', 'zeppelin',  'jspwiki', 'manifoldcf', 'zookeeper',
+                'openwebbeans', 'deltaspike', 'tapestry-5', 'knox', 'commons-lang', 'xmlgraphics-batik']
 
-    # TODO: merge all from java diff -> Run szz
-    # for p in projects:
-    #     all_1 = pd.read_csv("Data/" + p + "//all_1.csv")
-    #     all_2 = pd.read_csv("Data/" + p + "//all_2.csv")
-    #     pd.concat([all_1, all_2]).to_csv("Data/" + p + "//all.csv")
+    # First task -  read the real data and split train test according split from the privies (ID)
+    for p in projects:
+        print(f"--------------------------- project {p}---------------------------")
+        all_data = pd.read_csv("Data/" + p + "//all_after_preprocess.csv").iloc[:, 1:]
+        all_data['ID'] = all_data['commit'] + "_" + all_data['file_name'].str.split("/").str[-1]
+        all_data.dropna(inplace=True)
+        for k in range(1, NUMBER_FOLD + 1):
+            print(f"-------------- cross {k} --------------")
+            PATH_FOLDER_DATA = "Data/" + p + "//" + str(k) + "//"
+            data_train = pickle.load(open(PATH_FOLDER_DATA + f"{p}_train.pkl", 'rb'))
+            ids_train, labels_train, _, _ = data_train
 
-    # #  TODO: 1. read the real data and split train test according split from the privies (ID)
-    # for p in projects:
-    #     print(f"--------------------------- project {p}---------------------------")
-    #     all_data = pd.read_csv("Data/" + p + "//all_after_preprocess.csv").iloc[:, 1:]
-    #     all_data['ID'] = all_data['commit'] + "_" + all_data['file_name'].str.split("/").str[-1]
-    #     all_data.dropna(inplace=True)
-    #     for k in range(1, NUMBER_FOLD + 1):
-    #         print(f"-------------- cross {k} --------------")
-    #         PATH_FOLDER_DATA = "Data/" + p + "//" + str(k) + "//"
-    #         data_train = pickle.load(open(PATH_FOLDER_DATA + f"{p}_train.pkl", 'rb'))
-    #         ids_train, labels_train, _, _ = data_train
-    #
-    #         data_test = pickle.load(open(PATH_FOLDER_DATA + f"{p}_test.pkl", 'rb'))
-    #         ids_test, _, _, _ = data_test
-    #         print(f"number instances {len(ids_test) + len(ids_train)}")
-    #         print(f"percent bug {sum(labels_train) / len(ids_train)}")
-    #
-    #         id_remove = [i for i in ids_train if i in ids_test] + [i for i in ids_test if i in ids_train]
-    #         print(f"id_remove {len(id_remove)}")
-    #         ids_test = [i for i in ids_test if i not in id_remove]
-    #         ids_train = [i for i in ids_train if i not in id_remove]
-    #         test = all_data[all_data['ID'].isin(ids_test)]
-    #         train = all_data[all_data['ID'].isin(ids_train)]
-    #         print(f"Number instance miss in train {(len(ids_train) - len(train)) / len(ids_train)}")
-    #         print(f"Number instance miss in test {(len(ids_test) - len(test)) / len(ids_test)}")
-    #         print(f"miss in all data {len(set(ids_test + ids_train) - set(all_data['ID']))}")
-    #
-    #         test.pop('commit')
-    #         test.pop('file_name')
-    #         train.pop('commit')
-    #         train.pop('file_name')
-    #         test.to_csv(PATH_FOLDER_DATA + f"{p}_test_tabular.csv", index=None)
-    #         train.to_csv(PATH_FOLDER_DATA + f"{p}_train_tabular.csv", index=None)
+            data_test = pickle.load(open(PATH_FOLDER_DATA + f"{p}_test.pkl", 'rb'))
+            ids_test, _, _, _ = data_test
+            print(f"number instances {len(ids_test) + len(ids_train)}")
+            print(f"percent bug {sum(labels_train) / len(ids_train)}")
 
-    # # TODO:  2. train on real data and predict on test or transformation
+            id_remove = [i for i in ids_train if i in ids_test] + [i for i in ids_test if i in ids_train]
+            print(f"id_remove {len(id_remove)}")
+            ids_test = [i for i in ids_test if i not in id_remove]
+            ids_train = [i for i in ids_train if i not in id_remove]
+            test = all_data[all_data['ID'].isin(ids_test)]
+            train = all_data[all_data['ID'].isin(ids_train)]
+            print(f"Number instance miss in train {(len(ids_train) - len(train)) / len(ids_train)}")
+            print(f"Number instance miss in test {(len(ids_test) - len(test)) / len(ids_test)}")
+            print(f"miss in all data {len(set(ids_test + ids_train) - set(all_data['ID']))}")
+
+            test.pop('commit')
+            test.pop('file_name')
+            train.pop('commit')
+            train.pop('file_name')
+            test.to_csv(PATH_FOLDER_DATA + f"{p}_test_tabular.csv", index=None)
+            train.to_csv(PATH_FOLDER_DATA + f"{p}_train_tabular.csv", index=None)
+
+    # Second task - train on real data and predict on test or transformation
     np.random.seed(420)
     save_dict_all = {}
     for project in projects:
-        # PATH_FOLDER_DATA = "Data/" + project + "/1/"
-        # dir = [x[0].split("/")[-1] for x in
-        #        os.walk(f'/sise/home/shir0/JavaTransformer/ans_from_java_diff_transformation/{project}/{1}')]
         transform_dir = ['BooleanExchange', 'LoopExchange', 'PermuteStatement', 'ReorderCondition', 'SwitchToIf',
                          'TryCatch', 'UnusedStatement', 'VariableRenaming']
 
-        for predict_data in ["test"] + transform_dir:  #  TODO:
-            print(f"---------------------------------------------{predict_data}-------------------------------")
+        for predict_data in ["test"] + transform_dir:
             save_dict = {}
             importances_rf, importances_lr = [], []
-            for k in range(1, NUMBER_FOLD + 1):  # todo
+            for k in range(1, NUMBER_FOLD + 1):
                 PATH_FOLDER_DATA = "Data/" + project + "//" + str(k) + "//"
                 train_data = pd.read_csv(PATH_FOLDER_DATA + f"{project}_train_tabular.csv")
                 if predict_data in ["test"]:
@@ -641,22 +596,22 @@ if __name__ == '__main__':
                     transformer = False
                 else:
                     if not os.path.exists(
-                            f'/sise/home/shir0/JavaTransformer/ans_from_java_diff_transformation/{project}/{str(k)}/{predict_data}/all.csv'):
+                            f'../JavaTransformer/ans_from_java_diff_transformation/{project}/{str(k)}/{predict_data}/all.csv'):
                         dir = [x[2] for x in os.walk(
-                            f'/sise/home/shir0/JavaTransformer/ans_from_java_diff_transformation/{project}/{str(k)}/{predict_data}/')][
+                            f'../JavaTransformer/ans_from_java_diff_transformation/{project}/{str(k)}/{predict_data}/')][
                             0]
                         transform_dir = [i for i in dir if i != project and i != ""]
                         merge = []
                         for i in transform_dir:
                             merge.append(pd.read_csv(
-                                f'/sise/home/shir0/JavaTransformer/ans_from_java_diff_transformation/{project}/{str(k)}/{predict_data}/{i}',
+                                f'../JavaTransformer/ans_from_java_diff_transformation/{project}/{str(k)}/{predict_data}/{i}',
                                 header=None))
                         pd.concat(merge).to_csv(
-                            f'/sise/home/shir0/JavaTransformer/ans_from_java_diff_transformation/{project}/{str(k)}/{predict_data}/all.csv',
+                            f'../JavaTransformer/ans_from_java_diff_transformation/{project}/{str(k)}/{predict_data}/all.csv',
                             index=False)
 
                     test_data = pd.read_csv(
-                        f'/sise/home/shir0/JavaTransformer/ans_from_java_diff_transformation/{project}/{str(k)}/{predict_data}/all.csv',
+                        f'../JavaTransformer/ans_from_java_diff_transformation/{project}/{str(k)}/{predict_data}/all.csv',
                         header=None, names=columns_transformer)
                     test_data = test_data[1:]
                     transformer = True
@@ -677,27 +632,6 @@ if __name__ == '__main__':
                         test_ = test_[list(test_real_data.columns)]
                         new_test_data = pd.concat([new_test_data, test_])
 
-                    #     x = dict(test_real_data[test_real_data['ID'] == id_].iloc[0])
-                    #     y = dict(test_)
-                    #     dict_s = {k: abs(x[k]-y[k].values[0]) for k in x if x[k] != y[k].values[0]}
-                    #     if save_dict == {}:
-                    #         save_dict = dict_s
-                    #     else:
-                    #         combined_keys = set(dict_s.keys() | save_dict.keys())
-                    #         save_dict = {key: dict_s.get(key, 0) + save_dict.get(key, 0) for key in combined_keys}
-                    #
-                    # # print(save_dict)
-                    # old_val = save_dict_all.get(predict_data, None)
-                    # if old_val is None:
-                    #     save_dict_all[predict_data] = save_dict
-                    # else:
-                    #     combined_keys = set(save_dict_all[predict_data].keys() | save_dict.keys())
-                    #     save_dict = {key: save_dict_all[predict_data].get(key, 0) + save_dict.get(key, 0) for key in combined_keys}
-                    #     save_dict_all[predict_data] = OrderedDict(sorted(save_dict.items(), key=lambda kv: kv[1], reverse=True))
-                    # print(save_dict_all)
-                    # continue
-
-
                     test_data = new_test_data.reset_index()
                     test_data.pop("index")
 
@@ -712,15 +646,11 @@ if __name__ == '__main__':
                     param = tuning(X_train, y_train, space_rf, RandomForestClassifier(random_state=42))
                     tuning_rf_dict[project + "_" + str(k)] = [param['n_estimators'], param['criterion'],
                                                               param['max_features']]
-                # print(tuning_rf_dict)
-
                 rf_model = RandomForestClassifier(random_state=42,
                                                   n_estimators=tuning_rf_dict[project + "_" + str(k)][0],
                                                   criterion=tuning_rf_dict[project + "_" + str(k)][1],
                                                   max_features=tuning_rf_dict[project + "_" + str(k)][2])
                 rf_model.fit(X_train, y_train)
-
-                importances_rf.append(dict(zip(list(train_data.columns), rf_model.feature_importances_.tolist())))
                 predict(rf_model, save_dir=PATH_FOLDER_DATA + "RF", transformer=transformer)
 
                 # For LR
@@ -740,22 +670,9 @@ if __name__ == '__main__':
                                               l1_ratio=tuning_lr_dict[project + "_" + str(k)][2])
                 lr_model.fit(X_train, y_train)
 
-                importances_lr.append(dict(zip(list(train_data.columns), lr_model.coef_[0])))
-
-                # importances_lr.append(
-                #     dict(zip(list(train_data.columns), permutation_importance(lr_model, X_train, [int(i) for i in
-                #                                                                                   y_train],
-                #                                                               random_state=42).importances_mean.tolist())))
-
                 predict(lr_model, save_dir=PATH_FOLDER_DATA + "LR", transformer=transformer)
 
-            merge_metrics_and_evel(save_dir=PATH_FOLDER_DATA + "..//", name="RF",
-                                   importances=merge_importance(importances_rf))
-            merge_metrics_and_evel(save_dir=PATH_FOLDER_DATA + "..//", name="LR",
-                                   importances=merge_importance(importances_lr))
-            # print(tuning_rf_dict)
-            # print(tuning_lr_dict)
+            merge_metrics_and_evel(save_dir=PATH_FOLDER_DATA + "..//", name="RF")
+            merge_metrics_and_evel(save_dir=PATH_FOLDER_DATA + "..//", name="LR")
 
-    # todo:  merge importnaces - update when all project Done
-    # merge_all_importance("LR")
-    # merge_all_importance("RF")
+
